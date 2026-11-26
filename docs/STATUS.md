@@ -4,7 +4,7 @@ The claims pilot from `docs/SPEC.md`, built to `docs/PLAN.md`.
 
 ## Built
 
-- `backend/`: FastAPI on SQLite. The database is created and seeded from `data/` on first use (never from `data/evals/` or `data/security/`). Read operations for the queue, claims, policies, claim history, plans, policy wording, the agent's instructions and the handlers.
+- `backend/`: FastAPI on SQLite. The database is created and seeded from `data/` on first use (never from `data/evals/` or `data/security/`). Read operations for the queue, claims, policies, claim history, plans, policy wording, the agent's instructions and the handlers. Write operations for the claim lifecycle (waiting, in progress, waiting for sign-off, decided), the agent's steps, decisions, payments and sign-off. A payout over the $1,000 limit in `data/company.json` cannot be paid until a handler signs off; the sign-off makes the payment.
 - `agent/`: the hello-world skeleton, still to be replaced.
 - `dashboard/`: one page that shows whether the backend is up.
 - `e2e/`: one test of that page.

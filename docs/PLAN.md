@@ -30,8 +30,8 @@ Every operation has an `operation_id`, a one-line docstring and no optional inpu
 | `POST /api/claims/{claim_id}/start` | `start_claim` | `waiting` to `in_progress`; 409 otherwise |
 | `POST /api/claims/{claim_id}/steps` | `record_step` | Adds a step: `kind` (`tool_call`, `tool_result`, `message`) and `text` |
 | `GET /api/claims/{claim_id}/steps` | `list_steps` | The claim's steps in order, with timestamps |
-| `POST /api/claims/{claim_id}/decision` | `record_decision` | `decision` (`approve`, `decline`, `refer`), `payout`, `reasons`, `policy_section`. Approve over $1,000 goes to `awaiting_signoff`; decline and refer go to `decided` |
-| `POST /api/claims/{claim_id}/payments` | `pay_claim` | Takes `amount`. Pays only an approved claim, only the approved payout, and only when the payout is $1,000 or less or a handler has signed off; otherwise 409 with the reason. Approve at or under the limit goes to `decided` once paid |
+| `POST /api/claims/{claim_id}/decision` | `record_decision` | `decision` (`approve`, `decline`, `refer`), `payout`, `reasons`, `policy_section`. Approve over $1,000 goes to `awaiting_signoff`; everything else goes to `decided` |
+| `POST /api/claims/{claim_id}/payments` | `pay_claim` | Takes `amount`. Pays only an approved claim, only the approved payout, and only when the payout is $1,000 or less or a handler has signed off; otherwise 409 with the reason |
 | `POST /api/claims/{claim_id}/sign-off` | `sign_off` | Takes `handler_id`. Only for `awaiting_signoff`; records the sign-off, pays the approved payout and moves the claim to `decided` |
 
 Decline and refer carry a payout of $0.00. All amounts are rounded to cents.
@@ -65,13 +65,13 @@ Builds the write operations and the claim lifecycle. The sign-off rule is enforc
 
 Success criteria:
 
-- [ ] Tests cover each transition: `waiting` to `in_progress`; `in_progress` to `decided` on decline and refer; approve at $1,000.00 or less to `decided` after `pay_claim`; approve over $1,000 to `awaiting_signoff`, then `decided` after `sign_off`
-- [ ] A test: `pay_claim` on an approved $1,250.00 claim before sign-off returns 409 and records no payment
-- [ ] Tests: `pay_claim` returns 409 for a declined or referred claim, for an amount different from the approved payout, and for a second payment
-- [ ] Tests: `start_claim` on a claim that is not `waiting`, `record_decision` on a claim that is not `in_progress`, and `sign_off` on a claim that is not `awaiting_signoff` each return 409; `sign_off` with an unknown handler returns 404
-- [ ] A test: steps come back in the order they were recorded
-- [ ] Every route in `/openapi.json` has an `operation_id` and a summary, checked by a test
-- [ ] `npm run check:python` passes with coverage at or above 80%
+- [x] Tests cover each transition: `waiting` to `in_progress`; `in_progress` to `decided` on decline and refer; approve at $1,000.00 or less to `decided`, then paid by `pay_claim`; approve over $1,000 to `awaiting_signoff`, then `decided` after `sign_off`
+- [x] A test: `pay_claim` on an approved $1,250.00 claim before sign-off returns 409 and records no payment
+- [x] Tests: `pay_claim` returns 409 for a declined or referred claim, for an amount different from the approved payout, and for a second payment
+- [x] Tests: `start_claim` on a claim that is not `waiting`, `record_decision` on a claim that is not `in_progress`, and `sign_off` on a claim that is not `awaiting_signoff` each return 409; `sign_off` with an unknown handler returns 404
+- [x] A test: steps come back in the order they were recorded
+- [x] Every route in `/openapi.json` has an `operation_id` and a summary, checked by a test
+- [x] `npm run check:python` passes with coverage at or above 80%
 
 ## Phase 3: The UnderCover Agent
 
