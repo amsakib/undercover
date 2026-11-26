@@ -101,9 +101,9 @@ Builds the handlers' two main screens and the brand.
 
 Success criteria:
 
-- [ ] Vitest tests with a mocked `fetch` render the queue with 25 rows and the right status labels, and render a claim with and without a decision
-- [ ] `npm run check:ts` passes with coverage at or above 80% and no `any`
-- [ ] With `npm run dev`, checked in the browser with the Playwright MCP server: the queue lists `CLM-1001` first; clicking it opens the claim with its documents; the browser back button returns to the queue; dark mode follows the system setting
+- [x] Vitest tests with a mocked `fetch` render the queue with 25 rows and the right status labels, and render a claim with and without a decision
+- [x] `npm run check:ts` passes with coverage at or above 80% and no `any`
+- [x] With `npm run dev`, checked in the browser with the Playwright MCP server: the queue lists `CLM-1001` first; clicking it opens the claim with its documents; the browser back button returns to the queue; dark mode follows the system setting
 
 ## Phase 5: Live activity, sign-off and the instructions
 
