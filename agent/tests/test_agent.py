@@ -171,3 +171,10 @@ def test_model_name(monkeypatch):
     assert main.model().model_name == "openai/gpt-6-luna"
     monkeypatch.setenv("MODEL_NAME", "openrouter/free")
     assert main.model().model_name == "openrouter/free"
+
+
+def test_claim_stays_waiting_without_a_model(monkeypatch):
+    monkeypatch.delenv("OPENROUTER_API_KEY", raising=False)
+    with pytest.raises(KeyError):
+        main.run("CLM-1001", "thread-1")
+    assert claim("CLM-1001")["status"] == "waiting"

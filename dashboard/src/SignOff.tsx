@@ -11,17 +11,15 @@ export function SignOff({
   const [error, setError] = useState("");
 
   useEffect(() => {
-    void api.handlers().then((list) => {
-      setHandlers(list);
-      setHandlerId(list[0]?.handler_id ?? "");
-    });
+    void api.handlers().then(setHandlers);
   }, []);
 
   const payout = claim.decision?.payout ?? 0;
+  const selected = handlerId || (handlers[0]?.handler_id ?? "");
 
   const submit = () => {
     api
-      .signOff(claim.claim_id, handlerId)
+      .signOff(claim.claim_id, selected)
       .then(onSigned)
       .catch(() => {
         setError("The sign-off did not go through. Please try again.");
@@ -39,7 +37,7 @@ export function SignOff({
         <label>
           Handler{" "}
           <select
-            value={handlerId}
+            value={selected}
             onChange={(e) => {
               setHandlerId(e.target.value);
             }}
@@ -51,7 +49,7 @@ export function SignOff({
             ))}
           </select>
         </label>
-        <button type="button" disabled={!handlerId} onClick={submit}>
+        <button type="button" disabled={!selected} onClick={submit}>
           Sign off and pay {money(payout)}
         </button>
       </div>

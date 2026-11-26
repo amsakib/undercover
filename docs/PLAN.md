@@ -125,16 +125,16 @@ Success criteria:
 
 Locks in the whole flow and documents how to run it.
 
-- `playwright.config.ts`: the backend web server started with `UNDERCOVER_DB` pointing at a fresh file under `e2e/`, so the tests never touch the dev database.
+- `playwright.config.ts` and `e2e/backend.py`: the backend started on port 8100 with a fresh database at `e2e/test.db`, and the dashboard on port 5174 pointed at it, so the tests never touch the dev database.
 - `e2e/`: tests that drive state through the API (start, decision, payment) rather than a model, then check the screens: the queue and its statuses, a decided claim's page, the 409 on an early payment, and a handler signing off an over-limit claim. The existing health test is replaced or kept as it still applies.
 - `docs/STATUS.md`: what is built, how to run it (`npm run dev`, `uv run -m agent`, `uv run -m agent CLM-1001`), and how to reset the database (delete the file).
 
 Success criteria:
 
-- [ ] `npm run e2e` passes
-- [ ] `uv run -m agent` with the default model works the remaining waiting claims and prints a line for each; the queue in the browser shows none left waiting
-- [ ] `docs/STATUS.md` lists every command above and they each work as written
-- [ ] `npm run check` passes in full
+- [x] `npm run e2e` passes
+- [ ] (Not run: no `OPENROUTER_API_KEY`.) `uv run -m agent` with the default model works the remaining waiting claims and prints a line for each; the queue in the browser shows none left waiting
+- [x] `docs/STATUS.md` lists every command above and they each work as written
+- [x] `npm run check` passes in full
 
 ## Not in the pilot
 
