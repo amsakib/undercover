@@ -42,19 +42,19 @@ Decline and refer carry a payout of $0.00. All amounts are rounded to cents.
 
 Builds the database, the seed and every read operation the agent and dashboard need. Everything later stands on this.
 
-- `backend/db.py`: connect, create tables (`claims`, `policies`, `customers`, `plans`, `handlers`, `documents`, `decisions`, `payments`, `steps`), seed from `data/` when empty.
+- `backend/db.py`: connect, create tables (`claims`, `policies`, `customers`, `plans`, `handlers`, `settings`, `decisions`, `payments`, `steps`), seed from `data/` when empty.
 - `backend/main.py`: the `GET` routes in the table above, with 404s for unknown ids.
 - `backend/instructions.md`: a first version of the agent's instructions (see Phase 3; written here so the route has something to serve).
 - `.gitignore`: the database files.
 
 Success criteria:
 
-- [ ] `uv run pytest backend` passes, with tests for every route and every 404
-- [ ] A test asserts the seed loads 25 claims, all `waiting`, in the order of `data/claims.json`
-- [ ] A test asserts nothing from `data/evals/` or `data/security/` is in the database (no `CLM-1901`, no held-out claim ids)
-- [ ] `get_claim_history` returns previous claims and no email, phone, address or date of birth
-- [ ] With `npm run dev:backend` running, `curl localhost:8000/api/claims` returns 25 claims starting with `CLM-1001`, and `curl localhost:8000/api/claims/CLM-1001` returns its story, items and documents
-- [ ] `npm run check:python` passes
+- [x] `uv run pytest backend` passes, with tests for every route and every 404
+- [x] A test asserts the seed loads 25 claims, all `waiting`, in the order of `data/claims.json`
+- [x] A test asserts nothing from `data/evals/` or `data/security/` is in the database (no `CLM-1901`, no held-out claim ids)
+- [x] `get_claim_history` returns previous claims and no email, phone, address or date of birth
+- [x] With `npm run dev:backend` running, `curl localhost:8000/api/claims` returns 25 claims starting with `CLM-1001`, and `curl localhost:8000/api/claims/CLM-1001` returns its story, items and documents
+- [x] `npm run check:python` passes
 
 ## Phase 2: Decisions, payments and the sign-off rule
 
