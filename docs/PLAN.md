@@ -116,10 +116,10 @@ Builds the rest of what the team needs to see, and the handler's half of the sig
 
 Success criteria:
 
-- [ ] Vitest tests: the timeline renders steps in order; polling starts for `in_progress` and stops when the status changes; the sign-off button calls `sign_off` with the chosen handler and shows the claim as decided; the instructions page renders the text with no way to edit it
-- [ ] `npm run check:ts` passes
-- [ ] In the browser with the Playwright MCP server, after `uv run -m agent CLM-1001` with a real model: the queue shows `CLM-1001` as decided, and its page shows the decision, the reasons, the section and the agent's steps
-- [ ] In the browser: a claim the agent approved over $1,000 shows "Waiting for sign-off", and signing off as a handler moves it to decided with the payment shown
+- [x] Vitest tests: the timeline renders steps in order; polling starts for `in_progress` and stops when the status changes; the sign-off button calls `sign_off` with the chosen handler and shows the claim as decided; the instructions page renders the text with no way to edit it
+- [x] `npm run check:ts` passes
+- [ ] In the browser with the Playwright MCP server, after `uv run -m agent CLM-1001` with a real model (not run: there is no `OPENROUTER_API_KEY` in `.env`; checked instead with the real agent code and a scripted model against the running backend): the queue shows `CLM-1001` as decided, and its page shows the decision, the reasons, the section and the agent's steps
+- [x] In the browser: a claim the agent approved over $1,000 shows "Waiting for sign-off", and signing off as a handler moves it to decided with the payment shown
 
 ## Phase 6: End-to-end tests and handover
 

@@ -1,7 +1,9 @@
 import { useCallback, useEffect, useState } from "react";
-import { api, POLL_MS, type Claim, type Policy } from "./api";
+import { Activity } from "./Activity";
+import { api, POLL_MS, type Claim, type Policy, type Step } from "./api";
 import { DecisionChip, StatusChip } from "./Chip";
 import { label, money } from "./format";
+import { SignOff } from "./SignOff";
 
 function DecisionPanel({ claim }: Readonly<{ claim: Claim }>) {
   const { decision, payment } = claim;
@@ -109,12 +111,17 @@ function ClaimPanel({ claim }: Readonly<{ claim: Claim }>) {
 export function ClaimPage({ claimId }: Readonly<{ claimId: string }>) {
   const [claim, setClaim] = useState<Claim | null>(null);
   const [policy, setPolicy] = useState<Policy | null>(null);
+  const [steps, setSteps] = useState<Step[]>([]);
   const [missing, setMissing] = useState(false);
 
   const load = useCallback(() => {
     api
       .claim(claimId)
-      .then(setClaim)
+      .then((result) => {
+        setClaim(result);
+        return api.steps(claimId);
+      })
+      .then(setSteps)
       .catch(() => {
         setMissing(true);
       });
@@ -149,10 +156,14 @@ export function ClaimPage({ claimId }: Readonly<{ claimId: string }>) {
       <div className="claim-grid">
         <div className="column">
           <DecisionPanel claim={claim} />
+          {claim.status === "awaiting_signoff" && (
+            <SignOff claim={claim} onSigned={setClaim} />
+          )}
           <ClaimPanel claim={claim} />
         </div>
         <div className="column">
           {policy && <PolicyPanel policy={policy} />}
+          <Activity steps={steps} working={claim.status === "in_progress"} />
         </div>
       </div>
     </>
