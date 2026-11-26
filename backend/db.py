@@ -34,7 +34,7 @@ def load(name: str) -> Any:
 
 
 def seed(conn: sqlite3.Connection) -> None:
-    """Fill an empty database from the files in data/, leaving out evals."""
+    """Fill an empty database from the queue and records in data/."""
     claims = load("claims.json")
     conn.executemany(
         "INSERT INTO claims VALUES (?, ?, 'waiting', ?)",

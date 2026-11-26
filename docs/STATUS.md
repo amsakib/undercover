@@ -5,7 +5,7 @@ The claims pilot from `docs/SPEC.md`, built to `docs/PLAN.md`.
 ## Built
 
 - `backend/`: FastAPI on SQLite. The database is created and seeded from `data/` on first use (never from `data/evals/` or `data/security/`). Read operations for the queue, claims, policies, claim history, plans, policy wording, the agent's instructions and the handlers. Write operations for the claim lifecycle (waiting, in progress, waiting for sign-off, decided), the agent's steps, decisions, payments and sign-off. A payout over the $1,000 limit in `data/company.json` cannot be paid until a handler signs off; the sign-off makes the payment.
-- `agent/`: the hello-world skeleton, still to be replaced.
+- `agent/`: the UnderCover Agent, LangChain's `create_agent` on OpenRouter. Its tools reach the claim, policy, claim history, plan and policy wording through the API, and record the decision and pay the claim. Its instructions are `backend/instructions.md`, served by the API. Each run posts every tool call, tool result and message to the backend as a step.
 - `dashboard/`: one page that shows whether the backend is up.
 - `e2e/`: one test of that page.
 
@@ -13,6 +13,7 @@ The claims pilot from `docs/SPEC.md`, built to `docs/PLAN.md`.
 
 - `uv sync` and `npm install` install everything.
 - `npm run dev` starts the backend on port 8000 and the dashboard on port 5173.
+- `uv run -m agent` works every waiting claim in queue order, and `uv run -m agent CLM-1001` works one claim. Both need the backend running and `OPENROUTER_API_KEY` in `.env`; set `MODEL_NAME` to use another model, such as `openrouter/free`.
 - `npm run check` runs every check.
 
 The database is `backend/undercover.db`, or the file named in `UNDERCOVER_DB`. Delete it to start again from `data/`.

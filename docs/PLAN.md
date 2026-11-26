@@ -83,12 +83,12 @@ Replaces the hello-world agent with one that works a claim end to end through th
 
 Success criteria:
 
-- [ ] Tests with a stub model and the backend's `TestClient` (no model calls): an approve under the limit ends `decided` with a payment; an approve over the limit ends `awaiting_signoff` with no payment even though the stub calls `pay_claim`; a decline ends `decided` with no payment
-- [ ] A test: each tool call and result from a run shows up in `list_steps`
-- [ ] A test: the CLI with no argument works only the `waiting` claims, in queue order; with an id it works only that claim
-- [ ] A test asserts no file in `agent/` or `backend/` references `data/evals`
-- [ ] `test_model_name` still passes for the default model and `MODEL_NAME`
-- [ ] `npm run check:python` passes
+- [x] Tests with a stub model and the backend's `TestClient` (no model calls): an approve under the limit ends `decided` with a payment; an approve over the limit ends `awaiting_signoff` with no payment even though the stub calls `pay_claim`; a decline ends `decided` with no payment
+- [x] A test: each tool call and result from a run shows up in `list_steps`
+- [x] A test: the CLI with no argument works only the `waiting` claims, in queue order; with an id it works only that claim
+- [x] A test asserts no file in `agent/` or `backend/` references `data/evals`
+- [x] `test_model_name` still passes for the default model and `MODEL_NAME`
+- [x] `npm run check:python` passes
 
 ## Phase 4: The dashboard queue and claim pages
 
