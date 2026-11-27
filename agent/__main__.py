@@ -7,18 +7,16 @@ at five claims, and `uv run -m agent CLM-1001` works one claim.
 import argparse
 import sys
 
-from agent import main
-from agent.queue_agent import claims, run_queue
+from agent import api, harness
 
 
 def work_one(claim_id: str) -> None:
     """Work one claim, trying it a second time if it fails once."""
     try:
-        line = main.work_claim(claim_id)
-        print(line)
-        if main.get(f"/api/claims/{claim_id}")["status"] == "waiting":
-            print(main.work_claim(claim_id))
-    except main.RateLimitStop as stop:
+        print(harness.work_claim(claim_id))
+        if api.claim(claim_id)["status"] == "waiting":
+            print(harness.work_claim(claim_id))
+    except harness.RateLimitStop as stop:
         print(stop)
 
 
@@ -36,7 +34,7 @@ def cli(argv: list[str]) -> None:
     if args.claim_id:
         work_one(args.claim_id)
         return
-    run = run_queue(args.limit or len(claims()))
+    run = harness.run_queue(args.limit or len(api.claims()))
     print(run["summary"])
 
 

@@ -105,16 +105,8 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
   return (await response.json()) as T;
 }
 
-async function latestRun(): Promise<Run | null> {
-  const response = await fetch("/api/runs/latest");
-  if (response.status === 404) return null;
-  if (!response.ok)
-    throw new Error(`/api/runs/latest returned ${String(response.status)}`);
-  return (await response.json()) as Run;
-}
-
 export const api = {
-  latestRun,
+  latestRun: () => request<Run | null>("/api/runs/latest"),
   claims: () => request<ClaimRow[]>("/api/claims"),
   claim: (id: string) => request<Claim>(`/api/claims/${id}`),
   policy: (id: string) => request<Policy>(`/api/policies/${id}`),

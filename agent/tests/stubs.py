@@ -3,12 +3,11 @@
 from collections.abc import Iterator
 from typing import Any
 
-from fastapi.testclient import TestClient
 from langchain_core.language_models import BaseChatModel
 from langchain_core.messages import AIMessage
 from langchain_core.outputs import ChatGeneration, ChatResult
 
-from backend.main import app
+from agent import api
 
 
 class StubModel(BaseChatModel):
@@ -34,15 +33,16 @@ def stub(*replies):
     return StubModel(replies=iter(replies))
 
 
-def call(name, args, n="1"):
-    return AIMessage(content="", tool_calls=[{"name": name, "args": args, "id": n}])
+def call(name, args=None, n="1"):
+    return AIMessage(
+        content="", tool_calls=[{"name": name, "args": args or {}, "id": n}]
+    )
 
 
-def decision(claim_id, kind, payout, n="2"):
+def decision(kind, payout, n="2"):
     return call(
         "record_decision",
         {
-            "claim_id": claim_id,
             "decision": kind,
             "payout": payout,
             "reasons": "Covered by the wording.",
@@ -52,13 +52,13 @@ def decision(claim_id, kind, payout, n="2"):
     )
 
 
-def declines(claim_id):
-    return stub(decision(claim_id, "decline", 0), AIMessage(content="Declined."))
+def declines():
+    return stub(decision("decline", 0), AIMessage(content="Declined."))
 
 
 def claim(claim_id):
-    return TestClient(app).get(f"/api/claims/{claim_id}").json()
+    return api.claim(claim_id)
 
 
 def steps(claim_id):
-    return TestClient(app).get(f"/api/claims/{claim_id}/steps").json()
+    return api.request("GET", f"/claims/{claim_id}/steps")

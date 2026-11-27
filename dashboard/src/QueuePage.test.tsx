@@ -26,7 +26,7 @@ function queue(): ClaimRow[] {
 }
 
 it("lists every claim with its status", async () => {
-  mockApi({ "GET /api/claims": queue() });
+  mockApi({ "GET /api/claims": queue(), "GET /api/runs/latest": null });
   render(<QueuePage />);
   expect(await screen.findByText("CLM-1001")).toBeDefined();
   expect(screen.getAllByRole("row")).toHaveLength(26);
@@ -43,7 +43,10 @@ it("lists every claim with its status", async () => {
 
 it("refreshes the queue", async () => {
   vi.useFakeTimers({ shouldAdvanceTime: true });
-  const fetchMock = mockApi({ "GET /api/claims": [ROW] });
+  const fetchMock = mockApi({
+    "GET /api/claims": [ROW],
+    "GET /api/runs/latest": null,
+  });
   render(<QueuePage />);
   await screen.findByText("CLM-1001");
   await act(() => vi.advanceTimersByTimeAsync(2000));
@@ -136,7 +139,10 @@ it("shows the summary of a finished run", async () => {
 });
 
 it("shows no run panel before the first run", async () => {
-  mockApi({ "GET /api/claims": [{ ...ROW, status: "needs_handler" }] });
+  mockApi({
+    "GET /api/claims": [{ ...ROW, status: "needs_handler" }],
+    "GET /api/runs/latest": null,
+  });
   render(<QueuePage />);
   expect(await screen.findByText("CLM-1001")).toBeDefined();
   expect(screen.queryByRole("region", { name: "Current run" })).toBeNull();

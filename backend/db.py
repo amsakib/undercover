@@ -3,8 +3,12 @@
 import json
 import os
 import sqlite3
+from collections.abc import Iterator
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any
+from typing import Annotated, Any
+
+from fastapi import Depends, HTTPException
 
 DATA = Path(__file__).parent.parent / "data"
 DEFAULT_PATH = Path(__file__).parent / "undercover.db"
@@ -111,3 +115,31 @@ def setting(conn: sqlite3.Connection, key: str) -> Any:
     return json.loads(
         conn.execute("SELECT data FROM settings WHERE key = ?", (key,)).fetchone()[0]
     )
+
+
+def get_db() -> Iterator[sqlite3.Connection]:
+    """Open a database connection for one request."""
+    conn = connect()
+    try:
+        yield conn
+    finally:
+        conn.close()
+
+
+DB = Annotated[sqlite3.Connection, Depends(get_db)]
+
+
+def fetch(conn: sqlite3.Connection, table: str, key: str, value: str) -> Any:
+    """Return one record's data by its key, or raise a 404."""
+    row = conn.execute(
+        f"SELECT data FROM {table} WHERE {key} = ?",  # noqa: S608
+        (value,),
+    ).fetchone()
+    if row is None:
+        raise HTTPException(404, f"No {key} {value}")
+    return json.loads(row["data"])
+
+
+def now() -> str:
+    """Return the current time in UTC as ISO 8601."""
+    return datetime.now(UTC).isoformat(timespec="seconds")

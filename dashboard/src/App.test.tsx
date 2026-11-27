@@ -12,6 +12,7 @@ afterEach(() => {
 it("switches between the queue and a claim by the URL", async () => {
   mockApi({
     "GET /api/claims": [ROW],
+    "GET /api/runs/latest": null,
     "GET /api/claims/CLM-1001": CLAIM,
     "GET /api/policies/POL-2001": POLICY,
     "GET /api/claims/CLM-1001/steps": [],

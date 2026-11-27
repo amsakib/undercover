@@ -71,7 +71,7 @@ def test_get_plan(client):
 def test_get_instructions(client):
     assert "UnderCover Agent" in client.get("/api/instructions/claim").json()["text"]
     assert client.get("/api/instructions/queue").json()["text"]
-    assert client.get("/api/instructions/other").status_code == 404
+    assert client.get("/api/instructions/other").status_code == 422
 
 
 def test_list_handlers(client):
@@ -87,3 +87,10 @@ def test_unknown_ids_are_404(client):
         "/api/plans/gold",
     ]:
         assert client.get(path).status_code == 404, path
+
+
+def test_instructions_give_goals_not_scripts(client):
+    for name in ("queue", "claim"):
+        text = client.get(f"/api/instructions/{name}").json()["text"]
+        assert "## Your goal" in text
+        assert not any(line[:1].isdigit() for line in text.splitlines()), name

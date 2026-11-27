@@ -125,7 +125,7 @@ def test_steps_in_order(client):
 def test_every_operation_is_named_and_documented(client):
     paths = client.get("/openapi.json").json()["paths"]
     operations = [op for path in paths.values() for op in path.values()]
-    assert len(operations) == 22
+    assert len(operations) == 23
     for op in operations:
         assert op["operationId"]
         assert op["summary"] or op["description"]

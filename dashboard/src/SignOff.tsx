@@ -30,8 +30,8 @@ export function SignOff({
     <section className="panel signoff">
       <h2>Sign-off needed</h2>
       <p>
-        The agent approved a payout of {money(payout)}, which is over the
-        $1,000.00 limit. The payment waits until a handler signs off.
+        The agent approved a payout of {money(payout)}, which is over the limit
+        it may pay alone. The payment waits until a handler signs off.
       </p>
       <div className="signoff-form">
         <label>

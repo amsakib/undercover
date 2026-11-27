@@ -1,7 +1,7 @@
 import pytest
 from fastapi.testclient import TestClient
 
-from agent import main
+from agent import api, harness
 from backend.main import app
 
 
@@ -12,10 +12,12 @@ def fresh_db(tmp_path, monkeypatch):
 
 @pytest.fixture(autouse=True)
 def local_backend(monkeypatch):
-    monkeypatch.setattr(main, "backend", lambda: TestClient(app))
+    monkeypatch.setattr(
+        api, "client", TestClient(app, base_url="http://testserver/api")
+    )
 
 
 @pytest.fixture(autouse=True)
 def no_waiting(monkeypatch):
-    monkeypatch.setattr(main, "RETRY_DELAY", 0.0)
-    monkeypatch.setattr(main, "RATE_LIMIT_DELAY", 0.0)
+    monkeypatch.setattr(harness, "RETRY_DELAY", 0.0)
+    monkeypatch.setattr(harness, "RATE_LIMIT_DELAY", 0.0)

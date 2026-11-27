@@ -109,7 +109,7 @@ def test_released_claim_is_decided_once(client):
 
 
 def test_runs_and_todos(client):
-    assert client.get("/api/runs/latest").status_code == 404
+    assert client.get("/api/runs/latest").json() is None
     run = client.post("/api/runs", json={"claim_limit": 5}).json()
     assert run["status"] == "running"
     assert run["todos"] == []
@@ -131,6 +131,8 @@ def test_runs_and_todos(client):
     assert finished["status"] == "finished"
     assert finished["summary"] == "Three claims."
     assert finished["finished_at"]
+    assert client.get(f"/api/runs/{run['run_id']}").json() == finished
+    assert client.get("/api/runs/99").status_code == 404
     assert client.put("/api/runs/99/todos", json=[]).status_code == 404
 
 
