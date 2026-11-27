@@ -129,3 +129,9 @@ def test_every_operation_is_named_and_documented(client):
     for op in operations:
         assert op["operationId"]
         assert op["summary"] or op["description"]
+
+
+def test_queue_shows_the_decision(client):
+    decide(client, "CLM-1001", "decline", 0)
+    first = client.get("/api/claims").json()[0]
+    assert first["decision"] == {"decision": "decline", "payout": 0}

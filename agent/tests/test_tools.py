@@ -60,6 +60,7 @@ def test_list_waiting_claims_shows_the_room_left():
     listing = invoke(tools.list_waiting_claims, run_context(3))
     assert listing["may_start"] == 3
     assert listing["waiting"][0]["claim_id"] == "CLM-1001"
+    assert "customer_name" not in listing["waiting"][0]
 
 
 def test_finish_run_names_the_missed_claims():

@@ -60,15 +60,31 @@ def pay(conn: sqlite3.Connection, claim_id: str, amount: float, paid_by: str) ->
 
 @router.get("", operation_id="list_claims")
 def list_claims(conn: DB) -> list[dict[str, Any]]:
-    """List the claims queue in order, with each claim's status."""
-    rows = conn.execute("SELECT status, attempts, data FROM claims ORDER BY position")
+    """List the claims queue in order: each claim's status, the customer's name
+    for the handlers, and the decision once there is one."""
+    rows = conn.execute(
+        "SELECT c.status, c.attempts, c.data, cu.data AS customer, d.decision, "
+        "d.payout FROM claims c "
+        "JOIN customers cu ON cu.customer_id = json_extract(c.data, '$.customer_id') "
+        "LEFT JOIN decisions d ON d.claim_id = c.claim_id ORDER BY c.position"
+    )
     fields = ("claim_id", "claim_type", "summary", "submitted_on", "amount_claimed")
     claims = []
     for row in rows:
         data = json.loads(row["data"])
+        decision = (
+            {"decision": row["decision"], "payout": row["payout"]}
+            if row["decision"]
+            else None
+        )
         claims.append(
             {k: data[k] for k in fields}
-            | {"status": row["status"], "attempts": row["attempts"]}
+            | {
+                "customer_name": json.loads(row["customer"])["name"],
+                "status": row["status"],
+                "attempts": row["attempts"],
+                "decision": decision,
+            }
         )
     return claims
 

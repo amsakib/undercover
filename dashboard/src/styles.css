@@ -392,6 +392,63 @@ button:disabled {
   line-height: 1.6;
 }
 
+.kpis {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.kpi {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  background: var(--panel);
+  border-radius: 12px;
+  border-top: 4px solid var(--sea-mist);
+  padding: 1rem 1.25rem;
+}
+
+.kpi-waiting {
+  border-top-color: var(--marigold);
+}
+
+.kpi-in_progress {
+  border-top-color: var(--cerulean);
+}
+
+.kpi-awaiting_signoff {
+  border-top-color: var(--coral);
+}
+
+.kpi-needs_handler {
+  border-top-color: var(--raspberry);
+}
+
+.kpi-decided {
+  border-top-color: var(--sea-green);
+}
+
+.kpi-value {
+  font-size: 1.75rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.kpi-label {
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.decision-cell {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  white-space: nowrap;
+}
+
 @media (max-width: 800px) {
   .claim-grid {
     grid-template-columns: 1fr;

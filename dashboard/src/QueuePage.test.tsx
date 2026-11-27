@@ -25,20 +25,73 @@ function queue(): ClaimRow[] {
   }));
 }
 
-it("lists every claim with its status", async () => {
+function table() {
+  return within(screen.getByRole("table"));
+}
+
+function cards() {
+  return within(screen.getByRole("list", { name: "Claims by status" }));
+}
+
+it("lists every claim with its customer, status and decision", async () => {
   mockApi({ "GET /api/claims": queue(), "GET /api/runs/latest": null });
   render(<QueuePage />);
   expect(await screen.findByText("CLM-1001")).toBeDefined();
-  expect(screen.getAllByRole("row")).toHaveLength(26);
-  expect(screen.getAllByText("Waiting")).toHaveLength(7);
-  expect(screen.getAllByText("In progress")).toHaveLength(6);
-  expect(screen.getAllByText("Waiting for sign-off")).toHaveLength(6);
-  expect(screen.getAllByText("Decided")).toHaveLength(6);
-  expect(screen.getAllByText("$420.00")).toHaveLength(25);
+  expect(table().getAllByRole("row")).toHaveLength(26);
+  expect(table().getAllByText("Maya Patel")).toHaveLength(25);
+  expect(table().getAllByText("Waiting")).toHaveLength(7);
+  expect(table().getAllByText("In progress")).toHaveLength(6);
+  expect(table().getAllByText("Waiting for sign-off")).toHaveLength(6);
+  expect(table().getAllByText("Decided")).toHaveLength(6);
+  expect(table().getAllByText("$420.00")).toHaveLength(25);
+  expect(table().getAllByText("None yet")).toHaveLength(25);
   expect(screen.getByText("CLM-1001").getAttribute("href")).toBe(
     "#/claims/CLM-1001",
   );
-  expect(screen.getByText(/25 claims · 7 waiting/)).toBeDefined();
+});
+
+it("counts the claims in each status on the cards", async () => {
+  mockApi({ "GET /api/claims": queue(), "GET /api/runs/latest": null });
+  render(<QueuePage />);
+  await screen.findByText("CLM-1001");
+  expect(
+    cards()
+      .getAllByRole("listitem")
+      .map((li) => li.textContent),
+  ).toEqual([
+    "25Claims",
+    "7Waiting",
+    "6In progress",
+    "6Waiting for sign-off",
+    "0Left for a handler",
+    "6Decided",
+  ]);
+});
+
+it("shows a claim's decision and payout", async () => {
+  mockApi({
+    "GET /api/claims": [
+      {
+        ...ROW,
+        status: "decided",
+        decision: { decision: "approve", payout: 380 },
+      },
+      {
+        ...ROW,
+        claim_id: "CLM-1002",
+        status: "decided",
+        decision: { decision: "decline", payout: 0 },
+      },
+    ],
+    "GET /api/runs/latest": null,
+  });
+  render(<QueuePage />);
+  const approved = within(await screen.findByRole("row", { name: /CLM-1001/ }));
+  expect(approved.getByText("Approved")).toBeDefined();
+  expect(approved.getByText("$380.00")).toBeDefined();
+  const declined = within(screen.getByRole("row", { name: /CLM-1002/ }));
+  expect(declined.getByText("Declined")).toBeDefined();
+  expect(declined.getByText("$0.00")).toBeDefined();
 });
 
 it("refreshes the queue", async () => {
@@ -146,8 +199,10 @@ it("shows no run panel before the first run", async () => {
   render(<QueuePage />);
   expect(await screen.findByText("CLM-1001")).toBeDefined();
   expect(screen.queryByRole("region", { name: "Current run" })).toBeNull();
-  expect(screen.getByText("Left for a handler")).toBeDefined();
-  expect(screen.getByText(/1 left for a handler/)).toBeDefined();
+  expect(table().getByText("Left for a handler")).toBeDefined();
+  expect(
+    cards().getByText("Left for a handler").previousSibling?.textContent,
+  ).toBe("1");
 });
 
 it("says when the run cannot be read", async () => {

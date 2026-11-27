@@ -29,6 +29,10 @@ test("the queue lists every claim in order", async ({ page }) => {
   const rows = page.getByRole("row");
   await expect(rows).toHaveCount(26);
   await expect(rows.nth(1)).toContainText("CLM-1001");
+  await expect(rows.nth(1)).toContainText("Maya Patel");
+  await expect(
+    page.getByRole("list", { name: "Claims by status" }),
+  ).toContainText("25Claims");
 });
 
 test("a decided claim shows the decision, reasons and steps", async ({
@@ -37,9 +41,9 @@ test("a decided claim shows the decision, reasons and steps", async ({
 }) => {
   await decide(request, "CLM-1003", "decline", 0);
   await page.goto("/");
-  await expect(page.getByRole("row", { name: /CLM-1003/ })).toContainText(
-    "Decided",
-  );
+  const row = page.getByRole("row", { name: /CLM-1003/ });
+  await expect(row).toContainText("Decided");
+  await expect(row).toContainText("Declined");
   await page.getByRole("link", { name: "CLM-1003" }).click();
   await expect(page.getByText("Declined")).toBeVisible();
   await expect(page.getByText("Reasons for CLM-1003.")).toBeVisible();

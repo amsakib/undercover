@@ -17,7 +17,7 @@ The claims pilot from `docs/SPEC.md` is built, to the plan in `docs/PLAN.md`. Th
   - `harness.py`: the model, the shared rate limit and the middleware (retries, a longer backoff for rate limits, a limit on model calls, and backend refusals shown to the agent as tool results). `work_claim` runs a fresh claim agent on a new thread, records every step, and releases the claim whatever goes wrong; a rate limit that outlasts the retries puts the claim back without counting an attempt and stops the run. `run_queue` releases any claim an earlier run left in progress, starts the run, nudges the queue agent twice if it stops early, and always closes the run.
   - `__main__.py`: the command line.
 - `dashboard/`: React and Vite in the UnderCover brand, light and dark.
-  - `#/`: the current or last run with its to-do list and summary, and the queue with each claim's status, refreshed every two seconds.
+  - `#/`: a card per status with its count of claims, the current or last run with its to-do list and summary, and the queue with each claim's customer, status, and decision and payout, refreshed every two seconds. The customer's name is for the handlers only: the queue agent's listing leaves it out.
   - `#/claims/CLM-1001`: the claim in full with its policy, the agent's decision, reasons, section and payment, what the agent read, how many times it failed, and the agent's activity step by step, refreshed while it works. A claim waiting for sign-off has a panel where a handler signs off and pays it.
   - `#/instructions`: both sets of instructions, read only.
 - `agent/tests/test_structure.py` and `dashboard/src/structure.test.ts` check that only the `api` modules call the backend and that the agent's modules depend in one direction.

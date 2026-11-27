@@ -1,7 +1,7 @@
 import { vi } from "vitest";
 import type { Claim, ClaimRow, Policy } from "./api";
 
-export const ROW: ClaimRow = {
+const BASE = {
   claim_id: "CLM-1001",
   claim_type: "trip_delay",
   summary: "Flight home canceled",
@@ -9,10 +9,16 @@ export const ROW: ClaimRow = {
   amount_claimed: 420,
   status: "waiting",
   attempts: 0,
+} as const;
+
+export const ROW: ClaimRow = {
+  ...BASE,
+  customer_name: "Maya Patel",
+  decision: null,
 };
 
 export const CLAIM: Claim = {
-  ...ROW,
+  ...BASE,
   policy_id: "POL-2001",
   customer_id: "CUS-3001",
   incident_date: "2026-06-18",

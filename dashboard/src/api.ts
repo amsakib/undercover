@@ -1,7 +1,7 @@
 export type Status =
   "waiting" | "in_progress" | "awaiting_signoff" | "decided" | "needs_handler";
 
-export interface ClaimRow {
+interface ClaimBase {
   claim_id: string;
   claim_type: string;
   summary: string;
@@ -9,6 +9,11 @@ export interface ClaimRow {
   amount_claimed: number;
   status: Status;
   attempts: number;
+}
+
+export interface ClaimRow extends ClaimBase {
+  customer_name: string;
+  decision: Pick<Decision, "decision" | "payout"> | null;
 }
 
 export interface Item {
@@ -39,7 +44,7 @@ export interface Payment {
   paid_at: string;
 }
 
-export interface Claim extends ClaimRow {
+export interface Claim extends ClaimBase {
   policy_id: string;
   customer_id: string;
   incident_date: string;

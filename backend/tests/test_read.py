@@ -94,3 +94,10 @@ def test_instructions_give_goals_not_scripts(client):
         text = client.get(f"/api/instructions/{name}").json()["text"]
         assert "## Your goal" in text
         assert not any(line[:1].isdigit() for line in text.splitlines()), name
+
+
+def test_queue_shows_the_customer_and_no_decision_yet(client):
+    first = client.get("/api/claims").json()[0]
+    assert first["customer_name"] == "Maya Patel"
+    assert first["decision"] is None
+    assert "email" not in first
