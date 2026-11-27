@@ -6,6 +6,8 @@
 *.key
 
 # Python
+backend/*.db
+e2e/*.db
 __pycache__/
 *.py[cod]
 *.egg-info/

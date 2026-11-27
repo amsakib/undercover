@@ -14,8 +14,10 @@ The pre-commit hook runs the format, lint, type and unit test checks on every co
 
 When asked to plan, as in "Please plan the pilot", write the plan to `docs/PLAN.md` and write no code.
 
+- Start with the design: the modules you will add or change and what each one owns, checked against `docs/CODE_STANDARDS.md`. If the existing code does not fit the standards, the first phase restructures it before anything is built on top.
 - Split the work into phases, usually 5 or 6, each building on the last.
 - Give each phase detailed success criteria that you can verify yourself: tests that pass, commands and their output, API calls and their responses, and pages you check in the browser with the Playwright MCP server. Write each one as a checkbox.
+- End each phase's criteria with "The phase's diff passes a review against `docs/CODE_STANDARDS.md`".
 - Then stop and wait until you are asked to implement the plan.
 
 ## Implementing
@@ -24,14 +26,16 @@ When asked to implement the plan, as in "Please implement the plan for the pilot
 
 1. Build it, with tests.
 2. Check every success criterion and fix whatever fails.
-3. Tick off its criteria in `docs/PLAN.md` and update `docs/STATUS.md`.
-4. Commit. The pre-commit hook runs the checks; if it fails, fix the problem and commit again.
+3. Review the phase's diff as a reviewer would before you commit it: read it against every point in `docs/CODE_STANDARDS.md`, look for duplication, hard-coded values, a second way of doing something already done, modules reaching into each other and hand-written versions of what the framework provides, and fix what you find. Green checks are necessary but not enough: they test behavior, not design.
+4. Tick off its criteria in `docs/PLAN.md` and update `docs/STATUS.md`.
+5. Commit. The pre-commit hook runs the checks; if it fails, fix the problem and commit again.
 
-When the last phase is done, run `npm run check` and report the results.
+When the last phase is done, run `npm run check`, review the whole change once more against `docs/CODE_STANDARDS.md`, and report the results.
 
 ## Rules
 
 - Add tests with each change. Tests never call a model; use a stub model.
+- When you extend existing code, fit it to the standards first. Never pile a new feature onto a module that already does too much.
 - Outside a plan, commit each change once you have checked it.
 - Run `npm run check` before you hand work over.
 - Never use `git commit --no-verify`.
