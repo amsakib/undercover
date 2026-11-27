@@ -41,6 +41,7 @@ def test_get_claim(client):
     assert claim["status"] == "waiting"
     assert claim["decision"] is None
     assert claim["payment"] is None
+    assert claim["attempts"] == 0
 
 
 def test_get_policy(client):
@@ -67,13 +68,10 @@ def test_get_plan(client):
     }
 
 
-def test_get_policy_wording(client):
-    text = client.get("/api/policy-wording").json()["text"]
-    assert text.startswith("# UnderCover Travel Insurance: Policy Wording")
-
-
 def test_get_instructions(client):
-    assert "UnderCover Agent" in client.get("/api/instructions").json()["text"]
+    assert "UnderCover Agent" in client.get("/api/instructions/claim").json()["text"]
+    assert client.get("/api/instructions/queue").json()["text"]
+    assert client.get("/api/instructions/other").status_code == 404
 
 
 def test_list_handlers(client):

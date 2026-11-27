@@ -91,7 +91,7 @@ export const api = {
   policy: (id: string) => request<Policy>(`/api/policies/${id}`),
   steps: (id: string) => request<Step[]>(`/api/claims/${id}/steps`),
   handlers: () => request<Handler[]>("/api/handlers"),
-  instructions: () => request<{ text: string }>("/api/instructions"),
+  instructions: () => request<{ text: string }>("/api/instructions/claim"),
   signOff: (id: string, handlerId: string) =>
     request<Claim>(`/api/claims/${id}/sign-off`, {
       method: "POST",

@@ -135,7 +135,7 @@ def steps(message: BaseMessage) -> list[dict[str, str]]:
 def run(claim_id: str, thread_id: str, llm: BaseChatModel | None = None) -> str:
     """Run the agent on one claim and return its final reply."""
     with backend() as client:
-        instructions = client.get("/api/instructions").raise_for_status().json()
+        instructions = client.get("/api/instructions/claim").raise_for_status().json()
         agent = create_agent(
             llm or model(), tools=TOOLS, system_prompt=instructions["text"]
         )

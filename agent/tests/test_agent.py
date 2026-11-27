@@ -108,7 +108,7 @@ def test_every_step_is_recorded():
                     {"name": "get_claim", "args": {"claim_id": "CLM-1001"}, "id": "1"}
                 ],
             ),
-            call("get_policy_wording", {}, "2"),
+            call("get_claim", {"claim_id": "CLM-1002"}, "2"),
             decision("CLM-1001", "refer", 0),
             AIMessage(content="Referred."),
         ),

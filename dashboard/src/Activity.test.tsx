@@ -165,7 +165,9 @@ it("says when the sign-off fails", async () => {
 
 it("shows the agent's instructions read only", async () => {
   mockApi({
-    "GET /api/instructions": { text: "# UnderCover Agent\n\nDecide claims." },
+    "GET /api/instructions/claim": {
+      text: "# UnderCover Agent\n\nDecide claims.",
+    },
   });
   render(<InstructionsPage />);
   expect(await screen.findByText(/Decide claims\./)).toBeDefined();

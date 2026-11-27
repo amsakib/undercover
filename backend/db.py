@@ -11,7 +11,8 @@ DEFAULT_PATH = Path(__file__).parent / "undercover.db"
 
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS claims (
-    claim_id TEXT PRIMARY KEY, position INTEGER, status TEXT, data TEXT);
+    claim_id TEXT PRIMARY KEY, position INTEGER, status TEXT, attempts INTEGER,
+    data TEXT);
 CREATE TABLE IF NOT EXISTS policies (policy_id TEXT PRIMARY KEY, data TEXT);
 CREATE TABLE IF NOT EXISTS customers (customer_id TEXT PRIMARY KEY, data TEXT);
 CREATE TABLE IF NOT EXISTS plans (plan TEXT PRIMARY KEY, data TEXT);
@@ -25,7 +26,17 @@ CREATE TABLE IF NOT EXISTS payments (
 CREATE TABLE IF NOT EXISTS steps (
     step_id INTEGER PRIMARY KEY AUTOINCREMENT, claim_id TEXT, kind TEXT,
     text TEXT, at TEXT);
+CREATE TABLE IF NOT EXISTS documents (
+    document TEXT PRIMARY KEY, title TEXT, intro TEXT);
+CREATE TABLE IF NOT EXISTS sections (
+    document TEXT, section TEXT, position INTEGER, title TEXT, text TEXT,
+    PRIMARY KEY (document, section));
+CREATE TABLE IF NOT EXISTS runs (
+    run_id INTEGER PRIMARY KEY AUTOINCREMENT, claim_limit INTEGER, status TEXT,
+    todos TEXT, summary TEXT, started_at TEXT, finished_at TEXT);
 """
+
+DOCUMENTS = {"wording": "policy_wording.md", "manual": "claims_manual.md"}
 
 
 def load(name: str) -> Any:
@@ -33,11 +44,27 @@ def load(name: str) -> Any:
     return json.loads((DATA / name).read_text(encoding="utf-8"))
 
 
+def seed_document(conn: sqlite3.Connection, document: str, text: str) -> None:
+    """Store a markdown document split into its numbered ## sections."""
+    head, *parts = text.split("\n## ")
+    title, _, intro = head.removeprefix("# ").partition("\n")
+    conn.execute(
+        "INSERT INTO documents VALUES (?, ?, ?)", (document, title, intro.strip())
+    )
+    for position, part in enumerate(parts):
+        heading, _, body = part.partition("\n")
+        section, _, name = heading.partition(". ")
+        conn.execute(
+            "INSERT INTO sections VALUES (?, ?, ?, ?, ?)",
+            (document, section, position, name, body.strip()),
+        )
+
+
 def seed(conn: sqlite3.Connection) -> None:
     """Fill an empty database from the queue and records in data/."""
     claims = load("claims.json")
     conn.executemany(
-        "INSERT INTO claims VALUES (?, ?, 'waiting', ?)",
+        "INSERT INTO claims VALUES (?, ?, 'waiting', 0, ?)",
         [(c["claim_id"], i, json.dumps(c)) for i, c in enumerate(claims)],
     )
     for table, key, file in [
@@ -55,14 +82,14 @@ def seed(conn: sqlite3.Connection) -> None:
         "INSERT INTO plans VALUES (?, ?)",
         [(p["plan"], json.dumps(p)) for p in plans["plans"]],
     )
-    wording = (DATA / "policy_wording.md").read_text(encoding="utf-8")
+    for document, file in DOCUMENTS.items():
+        seed_document(conn, document, (DATA / file).read_text(encoding="utf-8"))
     conn.executemany(
         "INSERT INTO settings VALUES (?, ?)",
         [
             ("company", json.dumps(load("company.json"))),
             ("add_ons", json.dumps(plans["add_ons"])),
             ("deductible_applies_to", json.dumps(plans["deductible_applies_to"])),
-            ("policy_wording", json.dumps(wording)),
         ],
     )
 
