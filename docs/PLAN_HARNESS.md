@@ -1,5 +1,7 @@
 # Plan: the agent's harness
 
+This plan was built as written; the code was then restructured after review (see `docs/STATUS.md`). `agent/main.py` and `agent/queue_agent.py` are now `agent/api.py`, `agent/tools.py` and `agent/harness.py`, and `backend/main.py` is split into `backend/routers/`.
+
 The brief in `docs/HARNESS.md`: one run of the UnderCover Agent works the whole queue, plans it as a to-do list the team can watch, hands each claim to a fresh subagent, looks up the claims manual and the wording section by section, and puts its own problems right. Built on the pilot as `docs/STATUS.md` describes it, with the stack in `docs/TECH_STACK.md`.
 
 ## Approach
