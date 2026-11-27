@@ -2,52 +2,15 @@ from pathlib import Path
 
 import pytest
 from fastapi.testclient import TestClient
-from langchain_core.language_models.fake_chat_models import GenericFakeChatModel
 from langchain_core.messages import AIMessage
+from langchain_core.rate_limiters import InMemoryRateLimiter
 
 from agent import __main__ as cli
 from agent import main
+from agent.tests.stubs import call, claim, decision, stub
 from backend.main import app
 
 ROOT = Path(__file__).parent.parent.parent
-
-
-class StubModel(GenericFakeChatModel):
-    """A chat model that gives scripted replies in place of a real model."""
-
-    def bind_tools(self, tools, **kwargs):
-        return self
-
-
-@pytest.fixture(autouse=True)
-def local_backend(monkeypatch):
-    monkeypatch.setattr(main, "backend", lambda: TestClient(app))
-
-
-def call(name, args, n="1"):
-    return AIMessage(content="", tool_calls=[{"name": name, "args": args, "id": n}])
-
-
-def decision(claim_id, kind, payout):
-    return call(
-        "record_decision",
-        {
-            "claim_id": claim_id,
-            "decision": kind,
-            "payout": payout,
-            "reasons": "Covered by the wording.",
-            "policy_section": "Section 3. Trip Delay",
-        },
-        "2",
-    )
-
-
-def stub(*replies):
-    return StubModel(messages=iter(replies))
-
-
-def claim(claim_id):
-    return TestClient(app).get(f"/api/claims/{claim_id}").json()
 
 
 def test_approve_under_limit_is_paid():
@@ -168,9 +131,23 @@ def test_nothing_reads_the_evals():
 def test_model_name(monkeypatch):
     monkeypatch.setenv("OPENROUTER_API_KEY", "test-key")
     monkeypatch.delenv("MODEL_NAME", raising=False)
-    assert main.model().model_name == "openai/gpt-6-luna"
+    monkeypatch.delenv("MODEL_REQUESTS_PER_MINUTE", raising=False)
+    default = main.model()
+    assert default.model_name == "deepseek/deepseek-v4.1-flash"
+    assert default.reasoning_effort == "low"
+    assert default.rate_limiter is None
     monkeypatch.setenv("MODEL_NAME", "openrouter/free")
     assert main.model().model_name == "openrouter/free"
+    assert main.model().reasoning_effort is None
+
+
+def test_rate_limiter_is_shared(monkeypatch):
+    monkeypatch.setenv("OPENROUTER_API_KEY", "test-key")
+    monkeypatch.setenv("MODEL_REQUESTS_PER_MINUTE", "18")
+    first, second = main.model(), main.model()
+    assert first.rate_limiter is second.rate_limiter
+    assert isinstance(first.rate_limiter, InMemoryRateLimiter)
+    assert first.rate_limiter.requests_per_second == pytest.approx(0.3)
 
 
 def test_claim_stays_waiting_without_a_model(monkeypatch):

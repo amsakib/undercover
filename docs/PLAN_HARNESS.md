@@ -83,19 +83,19 @@ The agent that decides one claim, now reading the manual and the wording a secti
 
 Success criteria:
 
-- [ ] Tests with a stub model: a claim agent that calls `search_documents`, `get_section("manual", "9")` and `get_section("wording", "5")` and then declines records two `read` steps naming those sections, in order, and the claim ends `decided`
-- [ ] Test: a stub model that raises on its first call leaves the claim `waiting` with `attempts` 1 and an `error` step, and `work_claim` returns a line saying it failed and is back in the queue
-- [ ] Test: the same claim failing a second time ends `needs_handler`, and the line says it is left for a handler
-- [ ] Test: a stub that finishes without recording a decision counts as a failure and releases the claim
-- [ ] Test: a stub that keeps calling tools is stopped by the call limit and the claim is released, not left `in_progress`
-- [ ] Test: an approve over the limit still ends `awaiting_signoff` with no payment, and `work_claim` reports it as such
-- [ ] Test: `ModelRetryMiddleware` retries a stub model that fails once with a provider error and then succeeds, and the claim is decided with no `error` step
-- [ ] Tests: with `MODEL_REQUESTS_PER_MINUTE=18`, `model()` has a rate limiter at 0.3 requests a second, and the queue and claim models share the same one; without it, there is no limiter
-- [ ] Test: a stub model that raises a 429 once and then succeeds decides the claim, with no `error` step and no attempt counted
-- [ ] Test: a stub model that keeps raising 429s puts the claim back `waiting` with `attempts` 0 and an `error` step about the rate limit, and `work_claim` reports that the provider's rate limit stopped it
-- [ ] `test_model_name`: the default is `deepseek/deepseek-v4.1-flash` with reasoning effort low; `MODEL_NAME=openrouter/free` overrides it
-- [ ] The test that nothing in `agent/` or `backend/` mentions `evals` still passes, now covering `backend/instructions/`
-- [ ] `npm run check:python` passes
+- [x] Tests with a stub model: a claim agent that calls `search_documents`, `get_section("manual", "9")` and `get_section("wording", "5")` and then declines records two `read` steps naming those sections, in order, and the claim ends `decided`
+- [x] Test: a stub model that raises on its first call leaves the claim `waiting` with `attempts` 1 and an `error` step, and `work_claim` returns a line saying it failed and is back in the queue
+- [x] Test: the same claim failing a second time ends `needs_handler`, and the line says it is left for a handler
+- [x] Test: a stub that finishes without recording a decision counts as a failure and releases the claim
+- [x] Test: a stub that keeps calling tools is stopped by the call limit and the claim is released, not left `in_progress`
+- [x] Test: an approve over the limit still ends `awaiting_signoff` with no payment, and `work_claim` reports it as such
+- [x] Test: `ModelRetryMiddleware` retries a stub model that fails once with a provider error and then succeeds, and the claim is decided with no `error` step
+- [x] Tests: with `MODEL_REQUESTS_PER_MINUTE=18`, `model()` has a rate limiter at 0.3 requests a second, and the queue and claim models share the same one; without it, there is no limiter
+- [x] Test: a stub model that raises a 429 once and then succeeds decides the claim, with no `error` step and no attempt counted
+- [x] Test: a stub model that keeps raising 429s puts the claim back `waiting` with `attempts` 0 and an `error` step about the rate limit, and `work_claim` reports that the provider's rate limit stopped it
+- [x] `test_model_name`: the default is `deepseek/deepseek-v4.1-flash` with reasoning effort low; `MODEL_NAME=openrouter/free` overrides it
+- [x] The test that nothing in `agent/` or `backend/` mentions `evals` still passes, now covering `backend/instructions/`
+- [x] `npm run check:python` passes
 
 ## Phase 3: The queue agent and the command line
 
