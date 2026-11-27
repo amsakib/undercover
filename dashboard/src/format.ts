@@ -1,4 +1,4 @@
-import type { Status } from "./api";
+import type { Status, Todo } from "./api";
 
 const usd = new Intl.NumberFormat("en-US", {
   style: "currency",
@@ -19,4 +19,12 @@ export const STATUS_LABELS: Record<Status, string> = {
   in_progress: "In progress",
   awaiting_signoff: "Waiting for sign-off",
   decided: "Decided",
+  needs_handler: "Left for a handler",
+};
+
+export const TODO_LABELS: Record<Todo["status"], string> = {
+  todo: "To do",
+  in_progress: "In progress",
+  done: "Done",
+  handler: "Left for a handler",
 };

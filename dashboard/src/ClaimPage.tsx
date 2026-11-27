@@ -38,6 +38,28 @@ function DecisionPanel({ claim }: Readonly<{ claim: Claim }>) {
   );
 }
 
+function ReadPanel({ steps }: Readonly<{ steps: Step[] }>) {
+  const reads = [
+    ...new Set(steps.filter((s) => s.kind === "read").map((s) => s.text)),
+  ];
+  return (
+    <section className="panel">
+      <h2>What the agent read</h2>
+      {reads.length === 0 ? (
+        <p className="muted">
+          The agent has not read the wording or the manual yet.
+        </p>
+      ) : (
+        <ul className="reads">
+          {reads.map((text) => (
+            <li key={text}>{text}</li>
+          ))}
+        </ul>
+      )}
+    </section>
+  );
+}
+
 function PolicyPanel({ policy }: Readonly<{ policy: Policy }>) {
   return (
     <section className="panel">
@@ -152,6 +174,11 @@ export function ClaimPage({ claimId }: Readonly<{ claimId: string }>) {
       <div className="page-head">
         <h1 className="mono">{claim.claim_id}</h1>
         <StatusChip status={claim.status} />
+        {claim.attempts > 0 && (
+          <span className="muted">
+            Failed {claim.attempts} {claim.attempts === 1 ? "time" : "times"}
+          </span>
+        )}
       </div>
       <div className="claim-grid">
         <div className="column">
@@ -163,6 +190,7 @@ export function ClaimPage({ claimId }: Readonly<{ claimId: string }>) {
         </div>
         <div className="column">
           {policy && <PolicyPanel policy={policy} />}
+          <ReadPanel steps={steps} />
           <Activity steps={steps} working={claim.status === "in_progress"} />
         </div>
       </div>

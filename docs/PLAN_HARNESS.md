@@ -129,7 +129,7 @@ Success criteria:
 What the team sees: the run's to-do list, the sections each claim read, the new state and both sets of instructions.
 
 - `dashboard/src/api.ts`: `Run`, `Todo`, the `needs_handler` status, the `read` and `error` step kinds, `attempts`, and the new instructions route.
-- Queue page: a "Current run" panel above the table from `get_latest_run`, polled every two seconds while the run is `running`: the cap, each to-do with a status chip (To do, In progress, Done, Left for a handler) and a link to its claim, and the summary once finished. No panel before the first run.
+- Queue page: a "Current run" panel above the table from `get_latest_run`, refreshed every two seconds with the queue: the cap, each to-do with a status chip (To do, In progress, Done, Left for a handler) and a link to its claim, and the summary once finished. No panel before the first run.
 - Status chip and queue counts: "Left for a handler".
 - Claim page: a "What the agent read" panel listing the claim's `read` steps; `error` steps stand out in the activity timeline; the attempt count when it is above zero.
 - Instructions page: "Running the queue" and "Working a claim", both read only.
@@ -137,13 +137,13 @@ What the team sees: the run's to-do list, the sections each claim read, the new 
 
 Success criteria:
 
-- [ ] Vitest: the run panel renders to-dos in order with the right labels and links, shows the summary when finished, polls while running and stops when finished, and does not render before a run
-- [ ] Vitest: the claim page lists the sections read; an `error` step renders as an error; a `needs_handler` claim shows "Left for a handler"
-- [ ] Vitest: the instructions page shows both sets of instructions with no way to edit them
-- [ ] Playwright: after `start_run` and `update_todos` through the API, the queue page shows the to-do list; after another `update_todos` the ticked item shows Done without a reload
-- [ ] Playwright: a claim with `read` steps shows them under "What the agent read"; a claim released twice shows "Left for a handler" in the queue and on its page
-- [ ] `npm run check:ts` and `npm run e2e` pass, with no `any`
-- [ ] With `npm run dev`, in the browser with the Playwright MCP server, the run panel, the new chip and both instruction pages look right in light and dark mode
+- [x] Vitest: the run panel renders to-dos in order with the right labels and links, shows the summary when finished, refreshes with the queue so the to-dos tick off without a reload, and does not render before a run
+- [x] Vitest: the claim page lists the sections read; an `error` step renders as an error; a `needs_handler` claim shows "Left for a handler"
+- [x] Vitest: the instructions page shows both sets of instructions with no way to edit them
+- [x] Playwright: after `start_run` and `update_todos` through the API, the queue page shows the to-do list; after another `update_todos` the ticked item shows Done without a reload
+- [x] Playwright: a claim with `read` steps shows them under "What the agent read"; a claim released twice shows "Left for a handler" in the queue and on its page
+- [x] `npm run check:ts` and `npm run e2e` pass, with no `any`
+- [x] With `npm run dev`, in the browser with the Playwright MCP server, the run panel, the new chip and both instruction pages look right in light and dark mode
 
 ## Phase 5: The live run and handover
 

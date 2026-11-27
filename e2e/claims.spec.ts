@@ -80,6 +80,12 @@ test("the agent's instructions are shown read only", async ({ page }) => {
   await expect(
     page.getByRole("heading", { name: "Agent instructions" }),
   ).toBeVisible();
-  await expect(page.getByText(/You are the UnderCover Agent/)).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Running the queue" }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Working a claim" }),
+  ).toBeVisible();
+  await expect(page.getByText(/You are the UnderCover Agent/)).toHaveCount(2);
   await expect(page.getByRole("textbox")).toHaveCount(0);
 });

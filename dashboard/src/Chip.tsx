@@ -1,5 +1,5 @@
-import type { Decision, Status } from "./api";
-import { STATUS_LABELS } from "./format";
+import type { Decision, Status, Todo } from "./api";
+import { STATUS_LABELS, TODO_LABELS } from "./format";
 
 export function StatusChip({ status }: Readonly<{ status: Status }>) {
   return (
@@ -21,4 +21,8 @@ export function DecisionChip({
       {DECISION_LABELS[decision]}
     </span>
   );
+}
+
+export function TodoChip({ status }: Readonly<{ status: Todo["status"] }>) {
+  return <span className={`chip todo-${status}`}>{TODO_LABELS[status]}</span>;
 }

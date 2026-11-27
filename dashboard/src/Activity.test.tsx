@@ -163,14 +163,24 @@ it("says when the sign-off fails", async () => {
   ).toBeDefined();
 });
 
-it("shows the agent's instructions read only", async () => {
+it("shows both sets of the agent's instructions read only", async () => {
   mockApi({
+    "GET /api/instructions/queue": {
+      text: "# Running the queue\n\nPlan the run.",
+    },
     "GET /api/instructions/claim": {
       text: "# UnderCover Agent\n\nDecide claims.",
     },
   });
   render(<InstructionsPage />);
   expect(await screen.findByText(/Decide claims\./)).toBeDefined();
+  expect(await screen.findByText(/Plan the run\./)).toBeDefined();
+  expect(
+    screen.getByRole("heading", { name: "Running the queue" }),
+  ).toBeDefined();
+  expect(
+    screen.getByRole("heading", { name: "Working a claim" }),
+  ).toBeDefined();
   expect(screen.getByText("Read only")).toBeDefined();
   expect(screen.queryByRole("textbox")).toBeNull();
   expect(screen.queryByRole("button")).toBeNull();

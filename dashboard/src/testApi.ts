@@ -8,6 +8,7 @@ export const ROW: ClaimRow = {
   submitted_on: "2026-06-24",
   amount_claimed: 420,
   status: "waiting",
+  attempts: 0,
 };
 
 export const CLAIM: Claim = {

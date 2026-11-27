@@ -1,4 +1,5 @@
-export type Status = "waiting" | "in_progress" | "awaiting_signoff" | "decided";
+export type Status =
+  "waiting" | "in_progress" | "awaiting_signoff" | "decided" | "needs_handler";
 
 export interface ClaimRow {
   claim_id: string;
@@ -7,6 +8,7 @@ export interface ClaimRow {
   submitted_on: string;
   amount_claimed: number;
   status: Status;
+  attempts: number;
 }
 
 export interface Item {
@@ -65,7 +67,7 @@ export interface Policy {
 
 export interface Step {
   step_id: number;
-  kind: "tool_call" | "tool_result" | "message";
+  kind: "tool_call" | "tool_result" | "message" | "read" | "error";
   text: string;
   at: string;
 }
@@ -76,6 +78,24 @@ export interface Handler {
   role: string;
 }
 
+export interface Todo {
+  text: string;
+  status: "todo" | "in_progress" | "done" | "handler";
+  claim_id: string | null;
+}
+
+export interface Run {
+  run_id: number;
+  claim_limit: number;
+  status: "running" | "finished";
+  todos: Todo[];
+  summary: string;
+  started_at: string;
+  finished_at: string | null;
+}
+
+export type InstructionsName = "queue" | "claim";
+
 export const POLL_MS = 2000;
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
@@ -85,13 +105,23 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
   return (await response.json()) as T;
 }
 
+async function latestRun(): Promise<Run | null> {
+  const response = await fetch("/api/runs/latest");
+  if (response.status === 404) return null;
+  if (!response.ok)
+    throw new Error(`/api/runs/latest returned ${String(response.status)}`);
+  return (await response.json()) as Run;
+}
+
 export const api = {
+  latestRun,
   claims: () => request<ClaimRow[]>("/api/claims"),
   claim: (id: string) => request<Claim>(`/api/claims/${id}`),
   policy: (id: string) => request<Policy>(`/api/policies/${id}`),
   steps: (id: string) => request<Step[]>(`/api/claims/${id}/steps`),
   handlers: () => request<Handler[]>("/api/handlers"),
-  instructions: () => request<{ text: string }>("/api/instructions/claim"),
+  instructions: (name: InstructionsName) =>
+    request<{ text: string }>(`/api/instructions/${name}`),
   signOff: (id: string, handlerId: string) =>
     request<Claim>(`/api/claims/${id}/sign-off`, {
       method: "POST",
