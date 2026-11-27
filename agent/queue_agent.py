@@ -15,6 +15,12 @@ from pydantic import BaseModel
 from agent import main
 
 MAX_NUDGES = 2
+TODO_FOR_STATUS = {
+    "decided": "done",
+    "awaiting_signoff": "done",
+    "needs_handler": "handler",
+    "waiting": "todo, to try again",
+}
 ClaimModels = Callable[[str], BaseChatModel | None]
 
 
@@ -125,8 +131,9 @@ def queue_tools(run: Run, claim_llm: ClaimModels) -> list[BaseTool]:
                 )
             run.started.append(claim_id)
         line = main.work_claim(claim_id, claim_llm(claim_id))
-        print(line)
-        return line
+        print(line, flush=True)
+        status = main.get(f"/api/claims/{claim_id}")["status"]
+        return f"{line}. Mark its to-do {TODO_FOR_STATUS[status]}."
 
     @tool
     def finish_run(summary: str) -> str:

@@ -157,13 +157,13 @@ The run the brief asks for, on the real model, and the documents brought up to d
 
 Success criteria:
 
-- [ ] After reseeding, `uv run -m agent --limit 5` on `deepseek/deepseek-v4.1-flash` works five claims without help, prints a line for each and a summary, and exits
-- [ ] In the browser during that run: the to-do list appears, fills in and is ticked off; afterwards it shows the summary; 20 claims are still `waiting`
-- [ ] In the browser: each of the five claims shows its steps, the sections it read (at least one manual section each) and a decision or "Left for a handler"; none is `in_progress`
-- [ ] Trial on the free model, if its daily allowance allows: after reseeding, `MODEL_NAME=openrouter/free MODEL_REQUESTS_PER_MINUTE=18 uv run -m agent --limit 2` runs without a rate-limit failure, or, if the allowance runs out, stops cleanly with the claim back `waiting` and the reason in the summary
-- [ ] `curl localhost:8000/api/runs/latest` shows the run `finished` with five claim to-dos, none `todo` or `in_progress`
-- [ ] `docs/SPEC.md`, `docs/TECH_STACK.md` and `docs/STATUS.md` describe the product as built, and every command in `docs/STATUS.md` works as written
-- [ ] `npm run check` passes in full
+- [ ] After reseeding, `uv run -m agent --limit 5` on `deepseek/deepseek-v4.1-flash` works five claims without help, prints a line for each and a summary, and exits (not run on DeepSeek: this machine's `.env` sets `MODEL_NAME=openrouter/free`, which overrides the default. The same run on `openrouter/free` did all of this; see the free-model criterion below and `docs/STATUS.md`)
+- [x] In the browser during that run (on `openrouter/free`): the to-do list appears, fills in and is ticked off; afterwards it shows the summary; 20 claims are still `waiting`
+- [x] In the browser: each of the five claims shows its steps, the sections it read (at least one manual section each) and a decision or "Left for a handler"; none is `in_progress`
+- [x] Trial on the free model, if its daily allowance allows: after reseeding, `MODEL_NAME=openrouter/free MODEL_REQUESTS_PER_MINUTE=18 uv run -m agent --limit 2` runs without a rate-limit failure, or, if the allowance runs out, stops cleanly with the claim back `waiting` and the reason in the summary (run with `--limit 5`, both settings from `.env`: five claims in about 12 minutes, no rate-limit failure)
+- [x] `curl localhost:8000/api/runs/latest` shows the run `finished` with five claim to-dos, none `todo` or `in_progress` (the agent marked the two claims waiting for sign-off `handler` rather than `done`; `work_claim` now says which status to use)
+- [x] `docs/SPEC.md`, `docs/TECH_STACK.md` and `docs/STATUS.md` describe the product as built, and every command in `docs/STATUS.md` works as written
+- [x] `npm run check` passes in full
 
 ## Not in this build
 

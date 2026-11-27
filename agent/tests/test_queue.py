@@ -287,3 +287,19 @@ def test_cli_reports_a_rate_limit(monkeypatch, capsys):
     monkeypatch.setattr(main, "work_claim", stop)
     cli.cli(["CLM-1004"])
     assert "stopped by the rate limit" in capsys.readouterr().out
+
+
+def test_work_claim_says_how_to_mark_the_to_do():
+    run = queue_agent.Run({"run_id": 1, "claim_limit": 5})
+    work_claim = queue_agent.queue_tools(
+        run, models({"CLM-1002": [failing(), failing()]})
+    )[2]
+    assert work_claim.invoke({"claim_id": "CLM-1001"}) == (
+        "CLM-1001 decline $0.00 decided. Mark its to-do done."
+    )
+    assert work_claim.invoke({"claim_id": "CLM-1002"}).endswith(
+        "Mark its to-do todo, to try again."
+    )
+    assert work_claim.invoke({"claim_id": "CLM-1002"}).endswith(
+        "Mark its to-do handler."
+    )

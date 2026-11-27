@@ -186,6 +186,11 @@ tbody tr + tr td {
   white-space: nowrap;
 }
 
+td.mono,
+td > .mono {
+  white-space: nowrap;
+}
+
 .total td {
   font-weight: 600;
 }
