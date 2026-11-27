@@ -1,37 +1,44 @@
-"""Work the claims queue: `uv run -m agent` or `uv run -m agent CLM-1001`."""
+"""Work the claims queue.
 
+`uv run -m agent` works the whole queue, `uv run -m agent --limit 5` caps the run
+at five claims, and `uv run -m agent CLM-1001` works one claim.
+"""
+
+import argparse
 import sys
-from uuid import uuid4
 
-from agent import main as agent
-
-
-def waiting_claims() -> list[str]:
-    """Return the ids of the waiting claims, in queue order."""
-    with agent.backend() as client:
-        claims = client.get("/api/claims").raise_for_status().json()
-    return [c["claim_id"] for c in claims if c["status"] == "waiting"]
+from agent import main
+from agent.queue_agent import claims, run_queue
 
 
-def summary(claim_id: str) -> str:
-    """Return one line on where a claim ended up."""
-    with agent.backend() as client:
-        claim = client.get(f"/api/claims/{claim_id}").raise_for_status().json()
-    decision = claim["decision"]
-    if decision is None:
-        return f"{claim_id}  no decision  {claim['status']}"
-    return (
-        f"{claim_id}  {decision['decision']}  ${decision['payout']:,.2f}  "
-        f"{claim['status']}"
-    )
+def work_one(claim_id: str) -> None:
+    """Work one claim, trying it a second time if it fails once."""
+    try:
+        line = main.work_claim(claim_id)
+        print(line)
+        if main.get(f"/api/claims/{claim_id}")["status"] == "waiting":
+            print(main.work_claim(claim_id))
+    except main.RateLimitStop as stop:
+        print(stop)
 
 
-def main(claim_ids: list[str]) -> None:
-    """Work the given claims, or every waiting claim in queue order."""
-    for claim_id in claim_ids or waiting_claims():
-        agent.run(claim_id, str(uuid4()))
-        print(summary(claim_id))
+def parse(argv: list[str]) -> argparse.Namespace:
+    """Read the command line."""
+    parser = argparse.ArgumentParser(prog="uv run -m agent")
+    parser.add_argument("claim_id", nargs="?", help="work only this claim")
+    parser.add_argument("--limit", type=int, help="start at most this many claims")
+    return parser.parse_args(argv)
+
+
+def cli(argv: list[str]) -> None:
+    """Work one claim, or run the queue with an optional cap."""
+    args = parse(argv)
+    if args.claim_id:
+        work_one(args.claim_id)
+        return
+    run = run_queue(args.limit or len(claims()))
+    print(run["summary"])
 
 
 if __name__ == "__main__":
-    main(sys.argv[1:])
+    cli(sys.argv[1:])

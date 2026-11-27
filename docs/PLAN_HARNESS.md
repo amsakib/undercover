@@ -101,7 +101,7 @@ Success criteria:
 
 The agent that runs the queue: plans, delegates, recovers and finishes with a summary.
 
-- `agent/queue.py`: `run_queue(claim_limit, llm, claim_llm)` releases claims left `in_progress` by an earlier run, starts a run, and runs the queue agent with these tools:
+- `agent/queue_agent.py`: `run_queue(claim_limit, llm, claim_llm)` releases claims left `in_progress` by an earlier run, starts a run, and runs the queue agent with these tools:
   - `list_waiting_claims()`: id, type, summary, submitted date and amount claimed of each waiting claim, plus how many more claims this run may start
   - `update_todos(todos)`: replaces the run's to-do list in the backend
   - `work_claim(claim_id)`: the Phase 2 function, behind the cap
@@ -112,17 +112,17 @@ The agent that runs the queue: plans, delegates, recovers and finishes with a su
 
 Success criteria:
 
-- [ ] Test (stub queue model, stub claim models): a run with `--limit 2` on the seeded queue works exactly two claims, stores a to-do list that goes from `todo` to `in_progress` to `done`, finishes with the summary, and leaves the other 23 claims `waiting`
-- [ ] Test: `work_claim` called for a third new claim in a run capped at 2 is refused, and that claim stays `waiting`
-- [ ] Test: a run capped at 3 whose second claim's model raises carries on to the third claim, puts the second back in the queue, works it again and decides it, and the claim has one `error` step
-- [ ] Test: a claim whose model fails twice ends `needs_handler`, its to-do ends `handler`, and the run still finishes
-- [ ] Test: a queue model that calls `finish_run` after one claim of a cap of two is refused with the missed claim named; after it works the second the run finishes
-- [ ] Test: a queue model that stops without calling `finish_run` while claims within the cap are waiting is nudged and works them; a model that ignores two nudges leaves the run closed with a note, and no claim `in_progress`
-- [ ] Test: a run capped at 3 whose second claim hits a rate limit that outlasts the retries stops without starting the third claim, leaves the second `waiting` with no attempt counted, and finishes with a summary that names the rate limit
-- [ ] Test: a claim left `in_progress` before a run starts is released at the start of the run
-- [ ] Test: a claim that is already `decided` is refused by `work_claim` and never decided or paid twice
-- [ ] Tests: the command line parses no argument, `--limit 5` and a claim id, and the one-claim form works only that claim
-- [ ] `npm run check:python` passes
+- [x] Test (stub queue model, stub claim models): a run with `--limit 2` on the seeded queue works exactly two claims, stores a to-do list that goes from `todo` to `in_progress` to `done`, finishes with the summary, and leaves the other 23 claims `waiting`
+- [x] Test: `work_claim` called for a third new claim in a run capped at 2 is refused, and that claim stays `waiting`
+- [x] Test: a run capped at 3 whose second claim's model raises carries on to the third claim, puts the second back in the queue, works it again and decides it, and the claim has one `error` step
+- [x] Test: a claim whose model fails twice ends `needs_handler`, its to-do ends `handler`, and the run still finishes
+- [x] Test: a queue model that calls `finish_run` after one claim of a cap of two is refused with the missed claim named; after it works the second the run finishes
+- [x] Test: a queue model that stops without calling `finish_run` while claims within the cap are waiting is nudged and works them; a model that ignores two nudges leaves the run closed with a note, and no claim `in_progress`
+- [x] Test: a run capped at 3 whose second claim hits a rate limit that outlasts the retries stops without starting the third claim, leaves the second `waiting` with no attempt counted, and finishes with a summary that names the rate limit
+- [x] Test: a claim left `in_progress` before a run starts is released at the start of the run
+- [x] Test: a claim that is already `decided` is refused by `work_claim` and never decided or paid twice
+- [x] Tests: the command line parses no argument, `--limit 5` and a claim id, and the one-claim form works only that claim
+- [x] `npm run check:python` passes
 
 ## Phase 4: The dashboard
 

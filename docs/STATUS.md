@@ -1,6 +1,6 @@
 # Status
 
-The claims pilot from `docs/SPEC.md` is built, to the plan in `docs/PLAN.md`. The agent's harness from `docs/HARNESS.md` is being built to `docs/PLAN_HARNESS.md`: phases 1 (the backend for the harness) and 2 (the claim agent) are done.
+The claims pilot from `docs/SPEC.md` is built, to the plan in `docs/PLAN.md`. The agent's harness from `docs/HARNESS.md` is being built to `docs/PLAN_HARNESS.md`: phases 1 (the backend), 2 (the claim agent) and 3 (the queue agent and the command line) are done.
 
 ## Built
 

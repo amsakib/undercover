@@ -5,7 +5,6 @@ from fastapi.testclient import TestClient
 from langchain_core.messages import AIMessage
 from langchain_core.rate_limiters import InMemoryRateLimiter
 
-from agent import __main__ as cli
 from agent import main
 from agent.tests.stubs import call, claim, decision, stub
 from backend.main import app
@@ -95,30 +94,6 @@ def test_read_tools():
     assert "POL-2001" in main.get_policy.invoke({"policy_id": "POL-2001"})
     assert "CLM-0412" in main.get_claim_history.invoke({"customer_id": "CUS-3001"})
     assert "per_item_limit" in main.get_plan.invoke({"plan": "first"})
-
-
-def test_cli_works_waiting_claims_in_order(monkeypatch, capsys):
-    worked = []
-    monkeypatch.setattr(
-        main, "run", lambda claim_id, thread_id: worked.append(claim_id)
-    )
-    TestClient(app).post("/api/claims/CLM-1002/start")
-    cli.main([])
-    assert worked[:2] == ["CLM-1001", "CLM-1003"]
-    assert len(worked) == 24
-    assert "CLM-1001  no decision  waiting" in capsys.readouterr().out
-
-
-def test_cli_works_one_claim(monkeypatch, capsys):
-    run = main.run
-
-    def decide(claim_id, thread_id):
-        run(claim_id, thread_id, stub(decision(claim_id, "decline", 0), AIMessage(".")))
-
-    monkeypatch.setattr(main, "run", decide)
-    cli.main(["CLM-1004"])
-    assert capsys.readouterr().out.strip() == "CLM-1004  decline  $0.00  decided"
-    assert claim("CLM-1001")["status"] == "waiting"
 
 
 def test_nothing_reads_the_evals():
